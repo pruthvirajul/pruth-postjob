@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pruth-postjob-postgres
+    ports:
+      - "5755:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin321
+      POSTGRES_DB: job_post
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./Backend
+    container_name: pruth-postjob-backend
+    ports:
+      - "3216:3216"
+    depends_on:
+      - postgres
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: admin321
+      PGDATABASE: job_post
+      PGPORT: 5432
+
+  frontend:
+    build: ./Fronted
+    container_name: pruth-postjob-frontend
+    ports:
+      - "7011:80"
+
+  hr:
+    build: ./Hr
+    container_name: pruth-postjob-hr
+    ports:
+      - "7012:80"
+
+volumes:
+  postgres_data:
+
